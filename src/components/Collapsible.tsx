@@ -1,34 +1,41 @@
-import { useState } from "react";
+"use client";
+import { useId, useState } from "react";
 import Image from "next/image";
 
 interface CollapsibleProps {
   title: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
 }
 
-export default function Collapsible({ title, children }: CollapsibleProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggle = () => setIsOpen(!isOpen);
+export default function Collapsible({ title, children, defaultOpen = false, className }: CollapsibleProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const panelId = useId();
 
   return (
-    <div className="border rounded-md overflow-hidden shadow-sm">
+    <div className={`card overflow-hidden ${className ?? ""}`}>
       <button
-        onClick={toggle}
-        className="w-full text-left px-4 py-4 bg-white-200 hover:bg-gray-300 focus:outline-none flex justify-between items-center"
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className="w-full text-left px-4 py-3 flex justify-between items-center bg-[rgb(var(--card))] hover:bg-[rgba(0,0,0,.02)]"
+        aria-expanded={isOpen}
+        aria-controls={panelId}
       >
-        <span>{title}</span>
-        {isOpen ? (
-            <Image src="/up-arrow.svg" alt="" width={20} height={20} />
-        ) : 
-        (
-         <Image src="/down-arrow.svg" alt=""width={20} height={20}/>   
-        )}
+        <span className="font-medium">{title}</span>
+        <Image src={isOpen ? "/up-arrow.svg" : "/down-arrow.svg"} alt="" width={20} height={20} aria-hidden />
       </button>
-      <hr/>
-      {isOpen && <div className="p-4 bg-white">
-        {children}
-      </div>}
+
+      <div className="h-px bg-[rgb(var(--border))]" />
+
+      <div
+        id={panelId}
+        className={`transition-[grid-template-rows] duration-300 ease-in-out ${isOpen ? "grid grid-rows-[1fr]" : "grid grid-rows-[0fr]"}`}
+      >
+        <div className="overflow-hidden">
+          <div className="p-4">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }

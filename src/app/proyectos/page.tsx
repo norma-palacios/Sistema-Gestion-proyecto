@@ -6,6 +6,12 @@ import RoleGate from "@/components/RoleGate";
 import { useAuth } from "@/context/AuthContext";
 import { ProjectsApi } from "@/lib/projects";
 import type { Project } from "@/lib/types";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
+import { Input, Label } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export default function ProyectosPage() {
   const { user } = useAuth();
@@ -27,7 +33,6 @@ export default function ProyectosPage() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
   }, []);
@@ -49,27 +54,18 @@ export default function ProyectosPage() {
     await load();
   };
 
-  const activarEdicion = (proyecto: Project) => {
+  const activarEdicion = (p: Project) => {
     setEdicionActiva(true);
-    setProyectoId(proyecto.id);
-    setName(proyecto.name);
-    setDesc(proyecto.description || "");
+    setProyectoId(p.id);
+    setName(p.name);
+    setDesc(p.description || "");
   };
 
-  const editar = async (
-    idProyecto: number | null,
-    nombre: string,
-    descripcion: string
-  ) => {
-    if (idProyecto != null) {
-      const p: Project = {
-        id: idProyecto,
-        name: nombre,
-        description: descripcion,
-      };
-      await ProjectsApi.update(idProyecto, p);
+  const editar = async (id: number | null, nombre: string, descripcion: string) => {
+    if (id != null) {
+      await ProjectsApi.update(id, { id, name: nombre, description: descripcion });
       setName("");
-      setDesc(""); 
+      setDesc("");
       setEdicionActiva(false);
       await load();
     }
@@ -78,64 +74,72 @@ export default function ProyectosPage() {
   return (
     <PrivateRoute>
       <main className="min-h-screen p-6 space-y-6">
-        <h1 className="text-2xl font-bold">Proyectos</h1>
-
+        <PageHeader title="Proyectos" description="Organiza y prioriza tus proyectos" />
         {err && <div className="text-sm text-red-600">{err}</div>}
 
         <RoleGate allow={["gerente"]}>
-          <div className="border rounded-xl p-4 space-y-2">
-            <h2 className="font-semibold">Nuevo proyecto</h2>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              placeholder="Nombre"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <textarea
-              className="w-full border rounded-lg px-3 py-2"
-              placeholder="Descripción (opcional)"
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-            />
-
-            {edicionActiva ? (
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => editar(proyectoId, name, desc)}
-                  className="rounded-lg bg-black text-white px-3 py-2"
-                >
-                  Editar
-                </button>
-
-                <button
-                  onClick={() => setEdicionActiva(false)}
-                  className="rounded-lg bg-black text-white px-3 py-2"
-                >
-                  Cancelar
-                </button>
+          <Card>
+            <CardHeader>
+              <CardTitle>{edicionActiva ? "Editar proyecto" : "Nuevo proyecto"}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <Label>Nombre</Label>
+                <Input
+                  placeholder="Nombre"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
-            ) : (
-              <button
-                onClick={create}
-                className="rounded-lg bg-black text-white px-3 py-2"
-              >
-                Crear
-              </button>
-            )}
-          </div>
+              <div>
+                <Label>Descripción (opcional)</Label>
+                <Textarea
+                  placeholder="Descripción..."
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
+                />
+              </div>
+
+              {edicionActiva ? (
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => editar(proyectoId, name, desc)}
+                  >
+                    Guardar cambios
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setEdicionActiva(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              ) : (
+                <Button type="button" onClick={create}>
+                  Crear
+                </Button>
+              )}
+            </CardContent>
+          </Card>
         </RoleGate>
 
-        {!edicionActiva && (
-          <div className="grid gap-3">
-            {loading ? (
-              <p className="text-sm opacity-70">Cargando…</p>
-            ) : items.length === 0 ? (
-              <p className="text-sm opacity-70">No hay proyectos.</p>
-            ) : (
-              items.map((p) => (
+        {!edicionActiva &&
+          (loading ? (
+            <p className="text-sm opacity-70">Cargando…</p>
+          ) : items.length === 0 ? (
+            <EmptyState
+              title="No hay proyectos"
+              description="Crea tu primer proyecto para empezar."
+            />
+          ) : (
+            <div className="grid gap-3">
+              {items.map((p) => (
                 <div
                   key={p.id}
-                  className="border rounded-xl p-4 flex items-start justify-between gap-4"
+                  className="card p-4 flex items-start justify-between gap-4"
                 >
                   <div>
                     <div className="font-medium">{p.name}</div>
@@ -144,30 +148,33 @@ export default function ProyectosPage() {
                     )}
                   </div>
                   <RoleGate allow={["gerente"]}>
-                    <div className="flex flex-col space-y-2">
-                      <button
-                        className="text-sm underline"
-                        onClick={() => remove(p.id)}
-                      >
-                        Eliminar
-                      </button>
-                      <button
-                        className="text-sm underline"
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
                         onClick={() => activarEdicion(p)}
                       >
                         Editar
-                      </button>
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => remove(p.id)}
+                      >
+                        Eliminar
+                      </Button>
                     </div>
                   </RoleGate>
                 </div>
-              ))
-            )}
-          </div>
-        )}
+              ))}
+            </div>
+          ))}
 
         <p className="text-xs opacity-60">
-          Tu rol: <b>{user?.role}</b>. Los usuarios sólo visualizan; el gerente
-          puede crear/eliminar.
+          Tu rol: <b>{user?.role}</b>. Los usuarios sólo visualizan; el gerente puede
+          crear/eliminar.
         </p>
       </main>
     </PrivateRoute>
