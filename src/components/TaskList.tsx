@@ -119,4 +119,10 @@ const TaskList: React.FC<TaskListProps> = ({ projectId }) => {
             </button>
             <button onClick={() => deleteTask(task.id)}>Eliminar</button>
           </li>
-        ))
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default TaskList;
