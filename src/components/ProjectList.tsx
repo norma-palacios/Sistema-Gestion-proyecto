@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import TaskList from "./TaskList"; // Importa tu TaskList
+import TaskList from "./TaskList";
 
 interface Project {
   id: number;
