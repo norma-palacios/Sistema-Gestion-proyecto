@@ -93,6 +93,12 @@ Notas:
 - La variable de entorno NEXT_PUBLIC_API_URL permite cambiar la URL del backend. 
 - La UI y funcionalidades se adaptan segun el rol del usuario.
 
+### Repositorio del Backend
+- https://github.com/Bry070319/backend.git
+
+### Repositorio desplegado en vercel
+- https://github.com/Bry070319/Sistema-Gestion-proyecto.git
+
 ### Capturas
 - Login
 <img width="750" height="750" alt="image" src="https://github.com/user-attachments/assets/a5711dd2-4590-4cbb-adb3-a804d418017e" />
