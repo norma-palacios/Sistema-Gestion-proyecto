@@ -4,9 +4,14 @@ interface Task {
   id: number;
   title: string;
   completed: boolean;
+  projectId: number;
 }
 
-const TaskList: React.FC = () => {
+interface TaskListProps {
+  projectId: number;
+}
+
+const TaskList: React.FC<TaskListProps> = ({ projectId }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
   const [error, setError] = useState("");
@@ -14,15 +19,15 @@ const TaskList: React.FC = () => {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-  // Leer tareas
+  // Leer tareas del proyecto
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/tasks`);
+      const res = await fetch(`${API_URL}/tasks?projectId=${projectId}`);
       const data = await res.json();
       setTasks(data);
       setError("");
-    } catch (err) {
+    } catch {
       setError("Error cargando tareas");
     } finally {
       setLoading(false);
@@ -31,16 +36,17 @@ const TaskList: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [API_URL]);
+  }, [API_URL, projectId]);
 
   // Agregar tarea
   const addTask = async () => {
     if (!newTask.trim()) return;
+
     try {
       const res = await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTask, completed: false }),
+        body: JSON.stringify({ title: newTask, completed: false, projectId }),
       });
       const task = await res.json();
       setTasks([...tasks, task]);
@@ -80,7 +86,7 @@ const TaskList: React.FC = () => {
 
   return (
     <div style={{ maxWidth: "400px", margin: "0 auto", fontFamily: "Arial, sans-serif" }}>
-      <h2>Lista de Tareas</h2>
+      <h3>Lista de Tareas</h3>
 
       <div style={{ marginBottom: "10px" }}>
         <input
@@ -113,10 +119,4 @@ const TaskList: React.FC = () => {
             </button>
             <button onClick={() => deleteTask(task.id)}>Eliminar</button>
           </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-export default TaskList;
+        ))
