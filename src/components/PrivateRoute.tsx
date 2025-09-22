@@ -14,11 +14,8 @@ export default function PrivateRoute({ children }: { children: React.ReactNode }
   }, [loading, isAuthenticated, router]);
 
   if (loading) {
-    return <div className="p-6 text-sm text-gray-500">Cargando…</div>;
+    return <div className="min-h-[60vh] flex items-center justify-center text-sm text-[rgb(var(--muted-foreground))]">Cargando…</div>;
   }
   if (!isAuthenticated) return null;
-
   return <>{children}</>;
 }
-
-
