@@ -20,8 +20,11 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
     rules: {
-      // ⚠️ Bajamos los "any" a warning para que NO rompan el build en Vercel
       "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-empty-object-type": [
+        "error",
+        { "allowInterfaces": "with-single-extends" }, 
+      ],
     },
   },
 ];
