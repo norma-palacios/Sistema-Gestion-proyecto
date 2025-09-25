@@ -6,7 +6,7 @@ import { api } from "@/lib/api"; // <- usa tu instancia axios y .env
 type Role = "gerente" | "usuario";
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: Role;
