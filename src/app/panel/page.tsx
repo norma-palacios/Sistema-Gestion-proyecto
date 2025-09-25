@@ -21,13 +21,11 @@ export default function PanelPage() {
   const [err, setErr] = useState<string | null>(null);
   const [tareasMap, setTareasMap] = useState<Map<string, Task[]>>(new Map());
 
-  const updateStatus = async (id: number, status: TaskStatus) => {
-    await TasksApi.update(id, { status });
-    await load();
-  };
-
   const load = async () => {
     try {
+      setLoading(true);
+      if (!user) return;
+
       const [prj, tsks] = await Promise.all([
         ProjectsApi.list(),
         TasksApi.list(),
@@ -36,7 +34,7 @@ export default function PanelPage() {
       prj.forEach((p: Project) => proyectosMap.set(p.id, p.name));
 
       const map = new Map<string, Task[]>();
-      const tareasAsignadas = tsks.filter((item) => item.assignedTo === user?.id);
+      const tareasAsignadas = tsks.filter((item) => item.assignedTo.toString() === user?.id);
       tareasAsignadas.forEach((tarea: Task) => {
         const proyectoNombre = proyectosMap.get(tarea.projectId) ?? "Sin proyecto";
         if (!map.has(proyectoNombre)) map.set(proyectoNombre, []);
@@ -53,6 +51,11 @@ export default function PanelPage() {
   useEffect(() => {
     if (user?.id) load();
   }, [user]);
+
+   const updateStatus = async (id: number, status: TaskStatus) => {
+    await TasksApi.update(id, { status });
+    await load();
+  };
 
   return (
     <PrivateRoute>
@@ -109,7 +112,7 @@ export default function PanelPage() {
                       <span className="text-sm">Estado</span>
                       <Select
                         value={t.status}
-                        onChange={(e) => updateStatus(t.id, e.target.value as any)}
+                        onChange={(e) => updateStatus(t.id, e.target.value as TaskStatus)}
                       >
                         {statuses.map((s) => (
                           <option key={s} value={s}>
