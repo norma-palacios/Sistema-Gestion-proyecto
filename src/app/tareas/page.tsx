@@ -39,7 +39,7 @@ export default function TareasPage() {
         ProjectsApi.list(),
         user.role === "gerente"
           ? TasksApi.list()
-          : TasksApi.list({ assignedTo: parseInt(user.id)}),
+          : TasksApi.list({ assignedTo: user.id }),
         UsersApi.list({ role: "usuario" }),
       ]);
 

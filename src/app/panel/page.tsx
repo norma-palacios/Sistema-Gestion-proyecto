@@ -34,7 +34,7 @@ export default function PanelPage() {
       prj.forEach((p: Project) => proyectosMap.set(p.id, p.name));
 
       const map = new Map<string, Task[]>();
-      const tareasAsignadas = tsks.filter((item) => item.assignedTo.toString() === user?.id);
+      const tareasAsignadas = tsks.filter((item) => item.assignedTo === user?.id);
       tareasAsignadas.forEach((tarea: Task) => {
         const proyectoNombre = proyectosMap.get(tarea.projectId) ?? "Sin proyecto";
         if (!map.has(proyectoNombre)) map.set(proyectoNombre, []);
