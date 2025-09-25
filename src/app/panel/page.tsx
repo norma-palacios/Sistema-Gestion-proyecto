@@ -30,7 +30,7 @@ export default function PanelPage() {
     try {
       const [prj, tsks] = await Promise.all([
         ProjectsApi.list(),
-        TasksApi.list({ assignedTo: user?.id }),
+        TasksApi.list(),
       ]);
       const proyectosMap = new Map<number, string>();
       prj.forEach((p: Project) => proyectosMap.set(p.id, p.name));
@@ -51,8 +51,8 @@ export default function PanelPage() {
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    if (user?.id) load();
+  }, [user]);
 
   return (
     <PrivateRoute>
