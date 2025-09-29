@@ -115,5 +115,32 @@ Notas:
 - Panel Usuario
 <img width="750" height="750" alt="image" src="https://github.com/user-attachments/assets/74768861-8e78-4e0d-bd28-b146199d465e" />
 
+## Ejecución local (by Christian)
 
+```md
+## Ejecución local (by Christian)
 
+1) Instalar dependencias  
+```bash
+npm install
+
+```
+2) Levantar API mock (JSON Server)
+
+```bash
+Copiar código
+
+```
+3) Levantar la app
+```bash
+npm run dev   # http://localhost:3000
+```
+Endpoints del mock
+```bash
+
+GET http://localhost:4000/users
+
+GET http://localhost:4000/projects
+
+GET http://localhost:4000/tasks
+```
